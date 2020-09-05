@@ -8,15 +8,22 @@ import com.austine.blog.model.Post;
 import com.austine.blog.repository.CategoryRepository;
 import com.austine.blog.repository.PageRepository;
 import com.austine.blog.repository.PostRespository;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletContext;
 import javax.transaction.Transactional;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
@@ -36,34 +43,69 @@ public class AppService {
     private PageRepository pageRepository;
 
 
+    public ResponseEntity saveSupplyOrder(@RequestParam("image") MultipartFile file, @RequestParam("postDto") String postDto) throws JsonParseException, JsonMappingException, IOException {
 
 
-
-    public ResponseEntity saveSupplyOrder( @RequestParam("image") MultipartFile file, @RequestParam ("postDto") String postDto)throws IOException {
-
-
-        if (postDto == null) {
-        }
-        PostDto newPost=new ObjectMapper().readValue(postDto, PostDto.class);
-        newPost.setImage(file.getBytes());Optional<Category> categoryName = categoryRepository.findByCategoryName(newPost.getCategoryId());
-
+        PostDto newPost = new ObjectMapper().readValue(postDto, PostDto.class);
+        Optional<Category> categoryName = categoryRepository.findByCategoryName(newPost.getCategoryId());
         Post post = new Post();
-
         post.setCategoryId(categoryName.get());
         post.setDateCreated(new Date());
         post.setDescription(newPost.getDescription());
-        post.setImage(file.getBytes());
         post.setSlug(newPost.getSlug());
         post.setTitle(newPost.getTitle());
         post.setExcerpt(newPost.getExcerpt());
+        post.setImage(file.getBytes());
         post.setImageName(file.getOriginalFilename());
-        return ResponseEntity.ok(new ApiResponse<>(CustomMessages.Success, postRespository.save(post)));
+        Post post1 = postRespository.save(post);
+        if (post1 != null) {
+            return ResponseEntity.ok(new ApiResponse<>(CustomMessages.Success, HttpStatus.OK));
+        } else {
+            return ResponseEntity.ok(new ApiResponse<>(CustomMessages.NotSaved, HttpStatus.BAD_REQUEST));
+        }
     }
 
+    @Autowired
+    private ServletContext context;
 
 
+    public ResponseEntity savePostToServer(@RequestParam("image") MultipartFile file, @RequestParam("postDto") String postDto) throws JsonParseException, JsonMappingException, IOException {
 
 
+        PostDto newPost = new ObjectMapper().readValue(postDto, PostDto.class);
+        Optional<Category> categoryName = categoryRepository.findByCategoryName(newPost.getCategoryId());
+        boolean isExist = new File(context.getRealPath("/postimages/")).exists();
+        if (!isExist) {
+            new File(context.getRealPath("/postimages/")).mkdir();
+        }
+
+        String filename = file.getOriginalFilename();
+        String modifiedFileName = FilenameUtils.getBaseName(filename) + "_" + System.currentTimeMillis() + "." + FilenameUtils.getExtension(filename);
+        File serverfile = new File(context.getRealPath("/postimages/" + File.separator + modifiedFileName));
+        try {
+            FileUtils.writeByteArrayToFile(serverfile, file.getBytes());
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Post post = new Post();
+        post.setCategoryId(categoryName.get());
+        post.setDateCreated(new Date());
+        post.setDescription(newPost.getDescription());
+        post.setSlug(newPost.getSlug());
+        post.setTitle(newPost.getTitle());
+        post.setExcerpt(newPost.getExcerpt());
+//        post.setImage(file.getBytes());
+        post.setImageName(modifiedFileName);
+        post.setImageUrl(newPost.getImageUrl());
+        Post post2 = postRespository.save(post);
+        if (post2 != null) {
+            return ResponseEntity.ok(new ApiResponse<>(CustomMessages.Success, HttpStatus.OK));
+        } else {
+            return ResponseEntity.ok(new ApiResponse<>(CustomMessages.NotSaved, HttpStatus.BAD_REQUEST));
+        }
+    }
 
 
     public PostRespository getPostRespository() {

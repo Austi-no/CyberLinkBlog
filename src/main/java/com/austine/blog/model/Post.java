@@ -1,5 +1,7 @@
 package com.austine.blog.model;
 
+import com.austine.blog.model.auth.User;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -18,6 +20,9 @@ public class Post implements Serializable {
 
     @Column(name="IMAGE_NAME")
     private String imageName;
+
+    @Column(name="IMAGE_URL")
+    private String imageUrl;
 
     @Column(name="DECRIPTION")
     private String description;
@@ -38,7 +43,7 @@ public class Post implements Serializable {
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     private Category categoryId;
 
-    @JoinColumn(name = "USER", referencedColumnName = "ID")
+    @JoinColumn(name = "USER", referencedColumnName = "id")
     @ManyToOne(cascade = CascadeType.ALL)
     private User userId;
 
@@ -71,6 +76,14 @@ public class Post implements Serializable {
 
     public byte[] getImage() {
         return image;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public void setImage(byte[] image) {

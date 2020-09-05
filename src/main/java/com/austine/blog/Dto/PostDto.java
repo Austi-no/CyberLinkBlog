@@ -8,6 +8,7 @@ public class PostDto {
     private String description;
     private byte[] image;
     private String imageName;
+    private String imageUrl;
     private String slug;
     private String categoryId;
     private String excerpt;
@@ -16,6 +17,14 @@ public class PostDto {
     }
     public int getId() {
         return id;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public void setId(int id) {

@@ -31,19 +31,26 @@ public class PostController {
 
 
 
-    @ApiOperation("To Create a Post record")
+    @ApiOperation("To Create a Post record and save in the server")
     @PostMapping(value = "/create")
-    public ResponseEntity addPost(@RequestParam("image") MultipartFile file, @RequestParam ("postDto") String postDto) throws IOException{
-        return service.saveSupplyOrder(file, postDto);
+    public ResponseEntity createPost(@RequestParam("image") MultipartFile file, @RequestParam ("postDto") String postDto) throws IOException{
+        return service.  savePostToServer(file, postDto);
     }
 
 
+    @ApiOperation("To Create a Post record and save in the db")
+    @PostMapping(value = "/createPost")
+    public ResponseEntity addPost(@RequestParam("image") MultipartFile file, @RequestParam ("postDto") String postDto) throws IOException{
+        return service.saveSupplyOrder(file, postDto);
+    }
 
     @ApiOperation("To return all Post")
     @GetMapping("/allPosts")
     public List<Post> getAllRecords(){
         return service.getPostRespository().findAll();
     }
+
+
 
     @ApiOperation("To return a post by ID")
     @GetMapping("/Post/{id}")
