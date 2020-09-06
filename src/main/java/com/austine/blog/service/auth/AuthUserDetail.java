@@ -22,13 +22,13 @@ public class AuthUserDetail extends User implements UserDetails {
 
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
 
-        getRoles().forEach(role -> {
-            grantedAuthorities.add(new SimpleGrantedAuthority(role.getName()));
-            role.getPermissions().forEach(permission -> {
-                grantedAuthorities.add(new SimpleGrantedAuthority(permission.getName()));
-            });
-
-        });
+//        getRoles().forEach(role -> {
+//            grantedAuthorities.add(new SimpleGrantedAuthority(role.getName()));
+//            role.getPermissions().forEach(permission -> {
+//                grantedAuthorities.add(new SimpleGrantedAuthority(permission.getName()));
+//            });
+//
+//        });
         return grantedAuthorities;
     }
 

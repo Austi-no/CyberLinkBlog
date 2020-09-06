@@ -30,6 +30,8 @@ public class Post implements Serializable {
     @Column(name="SLUG")
     private String slug;
 
+
+
     @Column(name="EXERPT")
     private String excerpt;
 
@@ -39,15 +41,27 @@ public class Post implements Serializable {
     @Column(name="DATE")
     private Date dateCreated;
 
+    @Column(name="APPROVE")
+    private boolean approved;
+
     @JoinColumn(name = "CATEGORY", referencedColumnName = "ID")
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     private Category categoryId;
 
-    @JoinColumn(name = "USER", referencedColumnName = "id")
-    @ManyToOne(cascade = CascadeType.ALL)
-    private User userId;
+    @JoinColumn(name = "CREATED_BY", referencedColumnName = "id")
+    @ManyToOne(cascade = {CascadeType.REFRESH})
+    private User createdBy;
+
 
     public Post() {
+    }
+
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
     }
 
     public Long getId() {
@@ -106,13 +120,13 @@ public class Post implements Serializable {
         this.categoryId = categoryId;
     }
 
-    public User getUserId() {
-        return userId;
-    }
-
-    public void setUserId(User userId) {
-        this.userId = userId;
-    }
+//    public User getUserId() {
+//        return userId;
+//    }
+//
+//    public void setUserId(User userId) {
+//        this.userId = userId;
+//    }
 
     public String getSlug() {
         return slug;
@@ -136,5 +150,13 @@ public class Post implements Serializable {
 
     public void setImageName(String imageName) {
         this.imageName = imageName;
+    }
+
+    public boolean isApproved() {
+        return approved;
+    }
+
+    public void setApproved(boolean approved) {
+        this.approved = approved;
     }
 }

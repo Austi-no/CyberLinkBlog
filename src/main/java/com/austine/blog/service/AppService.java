@@ -98,7 +98,9 @@ public class AppService {
         post.setExcerpt(newPost.getExcerpt());
 //        post.setImage(file.getBytes());
         post.setImageName(modifiedFileName);
+        post.setApproved(newPost.isApproved());
         post.setImageUrl(newPost.getImageUrl());
+        post.setCreatedBy(newPost.getCreatedBy());
         Post post2 = postRespository.save(post);
         if (post2 != null) {
             return ResponseEntity.ok(new ApiResponse<>(CustomMessages.Success, HttpStatus.OK));

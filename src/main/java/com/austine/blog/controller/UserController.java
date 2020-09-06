@@ -72,14 +72,13 @@ public class UserController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
 
-        User principal = (User)authentication.getPrincipal();
+        User principal = (User) authentication.getPrincipal();
 
         UserDto userDTO = modelMapper.map(principal, UserDto.class);
 
         //get userID from database
 
         Optional<User> userIdToGet = oauthService.getUserByUsername(principal.getUsername());
-
 
 
         userDTO.setId(userIdToGet.get().getId());
@@ -131,10 +130,10 @@ public class UserController {
 //        clientDetails.setClientSecret(encodedClientSecret);
                 clientDetails.setClientSecret(encodedPassword);
                 clientDetails.setRefreshTokenValidity(10000);
-                clientDetails.setResourceIds("inventory-rest-api");
-//        clientDetails.setAuthorities("ROLE_user, Role_admin");
+                clientDetails.setResourceIds("cyberlink-rest-api");
+                clientDetails.setAuthorities("ROLE_user");
                 clientDetails.setScope("READ,WRITE");
-                clientDetails.setWebServerRedirectUri("http://localhost:9090/");
+                clientDetails.setWebServerRedirectUri("http://localhost:5050/");
 
                 System.out.println(userRecord);
 
@@ -147,13 +146,11 @@ public class UserController {
                 return ResponseEntity.ok(new ApiResponse<>(CustomMessages.Success, userRecord));
 
 
-            }
-            else throw new RecordAlreadyPresentException(
-                        "User with username: " + userRecord.getUsername() + " already exists!!");
+            } else throw new RecordAlreadyPresentException(
+                    "User with username: " + userRecord.getUsername() + " already exists!!");
+        } catch (RecordAlreadyPresentException e) {
+            return ResponseEntity.ok(new ApiResponse<>(CustomMessages.AlreadyExist, "User with username: " + userRecord.getUsername() + " already exists!!"));
         }
-                 catch(RecordAlreadyPresentException e) {
-                     return ResponseEntity.ok(new ApiResponse<>(CustomMessages.AlreadyExist,"User with username: " + userRecord.getUsername() + " already exists!!"));
-            }
     }
 
     @ApiOperation("To add role to user")
@@ -195,7 +192,7 @@ public class UserController {
 
     @ApiOperation("To return all Roles")
     @GetMapping("/list/roles")
-    public List<Role> getAllRoles(){
+    public List<Role> getAllRoles() {
         return oauthService.findAllRoles();
     }
 
@@ -203,11 +200,11 @@ public class UserController {
     @DeleteMapping("/deleteAssignedRole/{userId}/{roleId}")
     public ResponseEntity deleteAssignedRole(@PathVariable("userId") Long userId, @PathVariable("roleId") Long roleId) {
         Optional<User> user = oauthService.findUserById(userId);
-        if(user.isPresent()) {
-           List<Role> roleList = user.get().getRoles().stream().collect(Collectors.toList());
-           List<Role> filteredRoleList = roleList.stream().filter(x-> x.getId() != roleId).collect(Collectors.toList());
-           user.get().setRoles(filteredRoleList);
-           User savedUser = oauthService.saveUser(user.get());
+        if (user.isPresent()) {
+            List<Role> roleList = user.get().getRoles().stream().collect(Collectors.toList());
+            List<Role> filteredRoleList = roleList.stream().filter(x -> x.getId() != roleId).collect(Collectors.toList());
+            user.get().setRoles(filteredRoleList);
+            User savedUser = oauthService.saveUser(user.get());
         }
 
         return ResponseEntity.ok().body(new ApiResponse<>(CustomMessages.Success, CustomMessages.DeletedMessage));

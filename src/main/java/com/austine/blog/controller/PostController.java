@@ -34,7 +34,15 @@ public class PostController {
     @ApiOperation("To Create a Post record and save in the server")
     @PostMapping(value = "/create")
     public ResponseEntity createPost(@RequestParam("image") MultipartFile file, @RequestParam ("postDto") String postDto) throws IOException{
-        return service.  savePostToServer(file, postDto);
+        return service.savePostToServer(file, postDto);
+    }
+
+
+    @ApiOperation("To Approve Post")
+    @PostMapping(value = "/approve/post", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity addPurchaseOrder(@RequestBody Post post) {
+        Post ins = service.getPostRespository().save(post);
+        return ResponseEntity.ok(new ApiResponse<>(CustomMessages.Success, ins));
     }
 
 

@@ -1,6 +1,6 @@
 package com.austine.blog.Dto;
 
-import com.austine.blog.model.Category;
+import com.austine.blog.model.auth.User;
 
 public class PostDto {
     private int id;
@@ -12,9 +12,20 @@ public class PostDto {
     private String slug;
     private String categoryId;
     private String excerpt;
+    private boolean approved;
+    private User createdBy;
 
     public PostDto() {
     }
+
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
+    }
+
     public int getId() {
         return id;
     }
@@ -86,5 +97,13 @@ public class PostDto {
 
     public void setExcerpt(String excerpt) {
         this.excerpt = excerpt;
+    }
+
+    public boolean isApproved() {
+        return approved;
+    }
+
+    public void setApproved(boolean approved) {
+        this.approved = approved;
     }
 }
